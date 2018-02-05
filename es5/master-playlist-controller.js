@@ -51,9 +51,9 @@ var _syncController = require('./sync-controller');
 
 var _syncController2 = _interopRequireDefault(_syncController);
 
-var _webworkify = require('webworkify');
+var _webwackify = require('webwackify');
 
-var _webworkify2 = _interopRequireDefault(_webworkify);
+var _webwackify2 = _interopRequireDefault(_webwackify);
 
 var _decrypterWorker = require('./decrypter-worker');
 
@@ -159,7 +159,7 @@ var MasterPlaylistController = (function (_videojs$EventTarget) {
       label: 'segment-metadata'
     }, false).track;
 
-    this.decrypter_ = (0, _webworkify2['default'])(_decrypterWorker2['default'], workerResolve());
+    this.decrypter_ = (0, _webwackify2['default'])(_decrypterWorker2['default'], workerResolve());
 
     var segmentLoaderSettings = {
       hls: this.hls_,

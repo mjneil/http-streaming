@@ -31,9 +31,9 @@ var _removeCuesFromTrack2 = _interopRequireDefault(_removeCuesFromTrack);
 
 var _addTextTrackData = require('./add-text-track-data');
 
-var _webworkify = require('webworkify');
+var _webwackify = require('webwackify');
 
-var _webworkify2 = _interopRequireDefault(_webworkify);
+var _webwackify2 = _interopRequireDefault(_webwackify);
 
 var _transmuxerWorker = require('./transmuxer-worker');
 
@@ -259,7 +259,7 @@ var VirtualSourceBuffer = (function (_videojs$EventTarget) {
 
     // append muxed segments to their respective native buffers as
     // soon as they are available
-    this.transmuxer_ = (0, _webworkify2['default'])(_transmuxerWorker2['default'], workerResolve());
+    this.transmuxer_ = (0, _webwackify2['default'])(_transmuxerWorker2['default'], workerResolve());
     this.transmuxer_.postMessage({ action: 'init', options: options });
 
     this.transmuxer_.onmessage = function (event) {

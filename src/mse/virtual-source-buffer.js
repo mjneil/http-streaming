@@ -545,6 +545,10 @@ export default class VirtualSourceBuffer extends videojs.EventTarget {
     this.transmuxer_.postMessage({action: 'flush'});
   }
 
+  flush() {
+    this.transmuxer_.postMessage({action: 'superFlush'})
+  }
+
   /**
    * Appends gop information (timing and byteLength) received by the transmuxer for the
    * gops appended in the last call to appendBuffer

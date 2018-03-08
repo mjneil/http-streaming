@@ -140,7 +140,7 @@ class MessageHandlers {
    *
    * @param {Object} data event data, not really used
    */
-  flush(data) {
+  superFlush(data) {
     this.transmuxer.superFlush();
   }
 

@@ -13,7 +13,7 @@
  * message-based interface to a Transmuxer object.
  */
 import window from 'global/window';
-import mp4 from 'mux.js/lib/mp4';
+import mux from 'mux.js/lib/mux';
 
 /**
  * Re-emits transmuxer events by converting them into messages to the
@@ -23,47 +23,41 @@ import mp4 from 'mux.js/lib/mp4';
  * @private
  */
 const wireTransmuxerEvents = function(transmuxer) {
-  transmuxer.on('data', function(segment) {
+  transmuxer.on('data', function(event) {
     // transfer ownership of the underlying ArrayBuffer
     // instead of doing a copy to save memory
     // ArrayBuffers are transferable but generic TypedArrays are not
     // @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers#Passing_data_by_transferring_ownership_(transferable_objects)
-    let initArray = segment.initSegment;
-
-    segment.initSegment = {
-      data: initArray.buffer,
-      byteOffset: initArray.byteOffset,
-      byteLength: initArray.byteLength
+    const initSegment = {
+      data: event.data.track.initSegment.buffer,
+      byteOffset: event.data.track.initSegment.byteOffset,
+      byteLength: event.data.track.initSegment.byteLength
+    };
+    const boxes = {
+      data: event.data.boxes.buffer,
+      byteOffset: event.data.boxes.byteOffset,
+      byteLength: event.data.boxes.byteLength
+    };
+    const segment = {
+      boxes,
+      initSegment,
+      type: event.type,
+      sequence: event.data.sequence
     };
 
-    let typedArray = segment.data;
-
-    segment.data = typedArray.buffer;
-    window.postMessage({
+    postMessage({
       action: 'data',
-      segment,
-      byteOffset: typedArray.byteOffset,
-      byteLength: typedArray.byteLength
-    }, [segment.data]);
+      segment
+    }, [ segment.boxes.data, segment.initSegment.data ]);
   });
-
-  if (transmuxer.captionStream) {
-    transmuxer.captionStream.on('data', function(caption) {
-      window.postMessage({
-        action: 'caption',
-        data: caption
-      });
-    });
-  }
 
   transmuxer.on('done', function(data) {
     window.postMessage({ action: 'done' });
   });
 
-  transmuxer.on('gopInfo', function(gopInfo) {
-    window.postMessage({
-      action: 'gopInfo',
-      gopInfo
+  transmuxer.on('superdone', function() {
+    postMessage({
+      action: 'superdone'
     });
   });
 };
@@ -88,7 +82,7 @@ class MessageHandlers {
     if (this.transmuxer) {
       this.transmuxer.dispose();
     }
-    this.transmuxer = new mp4.Transmuxer(this.options);
+    this.transmuxer = new mux.Transmuxer(this.options);
     wireTransmuxerEvents(this.transmuxer);
   }
 
@@ -123,11 +117,11 @@ class MessageHandlers {
   setTimestampOffset(data) {
     let timestampOffset = data.timestampOffset || 0;
 
-    this.transmuxer.setBaseMediaDecodeTime(Math.round(timestampOffset * 90000));
+    // this.transmuxer.setBaseMediaDecodeTime(Math.round(timestampOffset * 90000));
   }
 
   setAudioAppendStart(data) {
-    this.transmuxer.setAudioAppendStart(Math.ceil(data.appendStart * 90000));
+    // this.transmuxer.setAudioAppendStart(Math.ceil(data.appendStart * 90000));
   }
 
   /**
@@ -140,12 +134,22 @@ class MessageHandlers {
     this.transmuxer.flush();
   }
 
+  /**
+   * Forces the pipeline to finish processing the last segment and emit it's
+   * results.
+   *
+   * @param {Object} data event data, not really used
+   */
+  flush(data) {
+    this.transmuxer.superFlush();
+  }
+
   resetCaptions() {
-    this.transmuxer.resetCaptions();
+    // this.transmuxer.resetCaptions();
   }
 
   alignGopsWith(data) {
-    this.transmuxer.alignGopsWith(data.gopsToAlignWith.slice());
+    // this.transmuxer.alignGopsWith(data.gopsToAlignWith.slice());
   }
 }
 

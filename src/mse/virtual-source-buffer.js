@@ -217,7 +217,7 @@ export default class VirtualSourceBuffer extends videojs.EventTarget {
         return this.data_(event);
       }
 
-      if (event.data.action === 'done') {
+      if (event.data.action === 'done' || event.data.action === 'superdone') {
         return this.done_(event);
       }
 
@@ -373,20 +373,15 @@ export default class VirtualSourceBuffer extends videojs.EventTarget {
    * @param {Event} event the data event from the transmuxer
    */
   data_(event) {
-    let segment = event.data.segment;
+    const segment = event.data.segment;
 
-    // Cast ArrayBuffer to TypedArray
-    segment.data = new Uint8Array(
-      segment.data,
-      event.data.byteOffset,
-      event.data.byteLength
-    );
+    segment.data = new Uint8Array(segment.boxes.data,
+                                  segment.boxes.byteOffset,
+                                  segment.boxes.byteLength);
 
-    segment.initSegment = new Uint8Array(
-      segment.initSegment.data,
-      segment.initSegment.byteOffset,
-      segment.initSegment.byteLength
-    );
+    segment.initSegment = new Uint8Array(segment.initSegment.data,
+                                         segment.initSegment.byteOffset,
+                                         segment.initSegment.byteLength);
 
     createTextTracksIfNecessary(this, this.mediaSource_, segment);
 

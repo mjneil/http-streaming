@@ -266,6 +266,12 @@ export default class PlaylistLoader extends EventTarget {
 
     const parser = new M3u8Parser();
 
+    if (this.hls_.options_.customM3u8Parsers.length) {
+      this.hls_.options_.customM3u8Parsers.forEach(customParser => {
+        parser.addParser(customParser);
+      });
+    }
+
     parser.push(xhr.responseText);
     parser.end();
     parser.manifest.uri = url;

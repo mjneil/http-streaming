@@ -996,7 +996,8 @@ export default class SegmentLoader extends videojs.EventTarget {
     const simpleSegment = {
       resolvedUri: segment.resolvedUri,
       byterange: segment.byterange,
-      requestId: segmentInfo.requestId
+      requestId: segmentInfo.requestId,
+      custom: segment.custom || {}
     };
 
     if (segment.key) {

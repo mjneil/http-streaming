@@ -349,6 +349,9 @@ class HlsHandler extends Component {
       this.options_.bandwidth = INITIAL_BANDWIDTH;
     }
 
+    // custom m3u8 parsers
+    this.options_.customM3u8Parsers = this.options_.customM3u8Parsers || [];
+
     // If the bandwidth number is unchanged from the initial setting
     // then this takes precedence over the enableLowInitialPlaylist option
     this.options_.enableLowInitialPlaylist =
